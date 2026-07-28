@@ -4,8 +4,8 @@
   "sub": "A selection of key milestones, in chronological order.",
   "milestones": [
     { "y": "2026", "t": "Ezeiza", "d": "Bathroom occupancy" },
-    { "y": "2026", "t": "Grupo Sanatorios", "d": "Panic buttons, Variable measurement for ITAES certification" },
-    { "y": "2025", "t": "Grupo Sanatorios", "d": "Cardiac arrest buttons" },
+    { "y": "2026", "t": "Grupo Omint", "d": "Panic buttons, Variable measurement for ITAES certification" },
+    { "y": "2025", "t": "Grupo Omint", "d": "Cardiac arrest buttons" },
     { "y": "2025", "t": "Ezeiza", "d": "Cart counter" },
     { "y": "2024", "t": "AYSAM II", "d": "Water micro-metering" },
     { "y": "2024", "t": "Tigre II", "d": "Smart City" },

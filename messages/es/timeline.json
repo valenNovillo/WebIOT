@@ -4,8 +4,8 @@
   "sub": "Una selección de hitos clave en orden cronológico.",
   "milestones": [
     { "y": "2026", "t": "Ezeiza", "d": "Ocupación sanitarios" },
-    { "y": "2026", "t": "Grupo Sanatorios", "d": "Botones de panico, Medición de variables para certificación ITAES" },
-    { "y": "2025", "t": "Grupo Sanatorios", "d": "Botones de paro cardiorrespiratorio" },
+    { "y": "2026", "t": "Grupo Omint", "d": "Botones de panico, Medición de variables para certificación ITAES" },
+    { "y": "2025", "t": "Grupo Omint", "d": "Botones de paro cardiorrespiratorio" },
     { "y": "2025", "t": "Ezeiza", "d": "Medidor de carritos" },
     { "y": "2024", "t": "AYSAM II", "d": "Micro medición de agua" },
     { "y": "2024", "t": "Tigre II", "d": "Smart City" },
