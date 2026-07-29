@@ -569,37 +569,34 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
         </div>
       )}
 
-      {/* List */}
-      {!form && items.length === 0 && <div style={emptyState}>{ui.emptyNews}</div>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {items.map((n, i) => {
-          if (n._id === form?._id) return null;
-          const draggable = !form;
-          return (
+      {/* List — hidden while the editor is open, it has no use there */}
+      {!form && (
+        <>
+          {items.length === 0 && <div style={emptyState}>{ui.emptyNews}</div>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {items.map((n, i) => (
             <div
               key={n._id}
-              draggable={draggable}
-              onDragStart={draggable ? () => onDragStart(i) : undefined}
-              onDragEnter={draggable ? () => onDragEnter(i) : undefined}
-              onDragOver={draggable ? (e) => e.preventDefault() : undefined}
-              onDragEnd={draggable ? onDragEnd : undefined}
+              draggable
+              onDragStart={() => onDragStart(i)}
+              onDragEnter={() => onDragEnter(i)}
+              onDragOver={(e) => e.preventDefault()}
+              onDragEnd={onDragEnd}
               style={{
                 ...cardStyle,
                 display: "flex", gap: 14, alignItems: "center",
-                cursor: draggable ? "grab" : "default",
+                cursor: "grab",
                 outline: dragOver === i ? "2px solid var(--brand-teal)" : "none",
                 outlineOffset: 2,
                 opacity: dragIndex.current === i ? 0.4 : 1,
                 transition: "opacity 0.15s, outline 0.15s",
               }}
             >
-              {draggable && (
-                <svg width="14" height="20" viewBox="0 0 14 20" fill="none" style={{ color: "var(--ink-faint)", flexShrink: 0 }} aria-hidden="true">
-                  {[0, 5, 10, 15].map((y) => [0, 6].map((x) => (
-                    <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.3" fill="currentColor" />
-                  )))}
-                </svg>
-              )}
+              <svg width="14" height="20" viewBox="0 0 14 20" fill="none" style={{ color: "var(--ink-faint)", flexShrink: 0 }} aria-hidden="true">
+                {[0, 5, 10, 15].map((y) => [0, 6].map((x) => (
+                  <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.3" fill="currentColor" />
+                )))}
+              </svg>
               <div style={{ width: 80, height: 50, position: "relative", borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "var(--bg-soft)" }}>
                 {n.imagenId
                   ? <Image src={`/api/images/${n.imagenId}`} alt="" fill style={{ objectFit: "cover" }} />
@@ -619,9 +616,10 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
                 <button onClick={() => del(n._id)} style={smallDangerBtn}>{ui.delete}</button>
               </div>
             </div>
-          );
-        })}
-      </div>
+            ))}
+          </div>
+        </>
+      )}
       {confirmModal}
     </div>
   );
