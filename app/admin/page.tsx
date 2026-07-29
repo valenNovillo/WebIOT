@@ -59,6 +59,10 @@ const uiText = {
     date: "Fecha",
     link: "Enlace",
     image: "Imagen",
+    titlePh: "Lanzamiento de la red LoRaWAN en Córdoba",
+    summaryPh: "Resumen breve de la novedad, en una o dos frases.",
+    categoryPh: "Eventos, Salud, Energía…",
+    linkPh: "https://ejemplo.com/nota",
     save: "Guardar",
     cancel: "Cancelar",
     edit: "Editar",
@@ -94,6 +98,10 @@ const uiText = {
     date: "Date",
     link: "Link",
     image: "Image",
+    titlePh: "LoRaWAN network launch in Córdoba",
+    summaryPh: "Short summary of the update, in one or two sentences.",
+    categoryPh: "Events, Health, Energy…",
+    linkPh: "https://example.com/article",
     save: "Save",
     cancel: "Cancel",
     edit: "Edit",
@@ -415,7 +423,7 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
     return {
       title_es: "", title_en: "",
       summary_es: "", summary_en: "",
-      category_es: "Eventos", category_en: "Events",
+      category_es: "", category_en: "",
       date: new Date().toISOString().split("T")[0],
       imagenId: null, link: "",
     };
@@ -495,15 +503,15 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
                 }}>{l.toUpperCase()}</span>
                 <div style={fieldCol}>
                   <label style={labelStyle}>{ui.title}</label>
-                  <input value={l === "es" ? form.title_es : form.title_en} onChange={(e) => patch(l === "es" ? "title_es" : "title_en", e.target.value)} style={inputStyle} />
+                  <input value={l === "es" ? form.title_es : form.title_en} onChange={(e) => patch(l === "es" ? "title_es" : "title_en", e.target.value)} placeholder={uiText[l].titlePh} style={inputStyle} />
                 </div>
                 <div style={fieldCol}>
                   <label style={labelStyle}>{ui.summary}</label>
-                  <textarea value={l === "es" ? form.summary_es : form.summary_en} onChange={(e) => patch(l === "es" ? "summary_es" : "summary_en", e.target.value)} style={{ ...inputStyle, height: 84, resize: "vertical" as const, lineHeight: 1.5 }} />
+                  <textarea value={l === "es" ? form.summary_es : form.summary_en} onChange={(e) => patch(l === "es" ? "summary_es" : "summary_en", e.target.value)} placeholder={uiText[l].summaryPh} style={{ ...inputStyle, height: 84, resize: "vertical" as const, lineHeight: 1.5 }} />
                 </div>
                 <div style={fieldCol}>
                   <label style={labelStyle}>{ui.category}</label>
-                  <input value={l === "es" ? form.category_es : form.category_en} onChange={(e) => patch(l === "es" ? "category_es" : "category_en", e.target.value)} style={inputStyle} />
+                  <input value={l === "es" ? form.category_es : form.category_en} onChange={(e) => patch(l === "es" ? "category_es" : "category_en", e.target.value)} placeholder={uiText[l].categoryPh} style={inputStyle} />
                 </div>
               </div>
             ))}
@@ -516,7 +524,7 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
             </div>
             <div style={fieldCol}>
               <label style={labelStyle}>{ui.link}</label>
-              <input value={form.link} onChange={(e) => patch("link", e.target.value)} placeholder="https://..." style={inputStyle} />
+              <input value={form.link} onChange={(e) => patch("link", e.target.value)} placeholder={ui.linkPh} style={inputStyle} />
             </div>
             <div style={fieldCol}>
               <label style={labelStyle}>{ui.image}</label>

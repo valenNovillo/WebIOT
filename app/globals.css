@@ -56,6 +56,8 @@ a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 ::selection { background: var(--brand-orange); color: white; }
 
+input::placeholder, textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+
 /* Shell */
 .shell {
   max-width: 1400px;
