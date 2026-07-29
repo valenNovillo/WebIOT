@@ -14,18 +14,21 @@ export async function PUT(
   try {
     const db = await getDb();
     const body = await req.json();
-    const update: Record<string, unknown> = {
-      title_es: body.title_es,
-      title_en: body.title_en,
-      summary_es: body.summary_es,
-      summary_en: body.summary_en,
-      category_es: body.category_es,
-      category_en: body.category_en,
-      link: body.link ?? "",
-      updatedAt: new Date(),
-    };
+    // Partial update: only touch the fields present in the body, so a
+    // reorder call (just `{ order }`) doesn't wipe the rest of the doc.
+    const update: Record<string, unknown> = { updatedAt: new Date() };
+    const textFields = [
+      "title_es", "title_en",
+      "summary_es", "summary_en",
+      "category_es", "category_en",
+      "link",
+    ] as const;
+    for (const f of textFields) {
+      if (body[f] !== undefined) update[f] = body[f];
+    }
     if (body.date) update.date = new Date(body.date);
     if (body.imagenId) update.images = [new ObjectId(body.imagenId)];
+    if (body.order !== undefined) update.order = body.order;
     await db
       .collection("novedads")
       .updateOne({ _id: new ObjectId(params.id) }, { $set: update });

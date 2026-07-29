@@ -45,6 +45,7 @@ const uiText = {
     name: "Nombre",
     logo: "Logo",
     uploadLogo: "Subir logo",
+    logoHint: "PNG transparente, horizontal (~400×225px, 16:9)",
     change: "Cambiar",
     uploading: "Subiendo…",
     dragHint: "Arrastrá las tarjetas para reordenar",
@@ -62,10 +63,13 @@ const uiText = {
     cancel: "Cancelar",
     edit: "Editar",
     uploadImage: "Subir imagen",
+    imageHint: "Recomendado: 1280×800px (16:10)",
     noLogo: "Sin logo",
     noImg: "Sin imagen",
     deleteClientConfirm: "¿Eliminar este cliente?",
     deleteNewsConfirm: "¿Eliminar esta novedad?",
+    emptyClients: "Todavía no hay clientes. Agregá el primero con el formulario de arriba.",
+    emptyNews: "Todavía no hay novedades. Creá la primera con el botón de arriba.",
   },
   en: {
     backToSite: "← Back to site",
@@ -76,6 +80,7 @@ const uiText = {
     name: "Name",
     logo: "Logo",
     uploadLogo: "Upload logo",
+    logoHint: "Transparent PNG, landscape (~400×225px, 16:9)",
     change: "Change",
     uploading: "Uploading…",
     dragHint: "Drag cards to reorder",
@@ -93,10 +98,13 @@ const uiText = {
     cancel: "Cancel",
     edit: "Edit",
     uploadImage: "Upload image",
+    imageHint: "Recommended: 1280×800px (16:10)",
     noLogo: "No logo",
     noImg: "No img",
     deleteClientConfirm: "Delete this client?",
     deleteNewsConfirm: "Delete this news item?",
+    emptyClients: "No clients yet. Add your first one with the form above.",
+    emptyNews: "No news yet. Create the first one with the button above.",
   },
 } as const;
 type Lang = keyof typeof uiText;
@@ -138,7 +146,7 @@ function ConfirmModal({ message, confirmLabel, cancelLabel, onConfirm, onCancel 
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button onClick={onCancel} style={secondaryBtn}>{cancelLabel}</button>
-          <button onClick={onConfirm} style={{ ...primaryBtn, background: "#c0392b" }}>{confirmLabel}</button>
+          <button onClick={onConfirm} style={{ ...primaryBtn, background: DANGER, borderColor: DANGER }}>{confirmLabel}</button>
         </div>
       </div>
     </div>
@@ -259,8 +267,8 @@ function ClientsTab({ pw, lang }: { pw: string; lang: Lang }) {
       {/* Add form */}
       <div style={formBox}>
         <h3 style={formTitle}>{ui.addClient}</h3>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18, alignItems: "start" }}>
+          <div style={fieldCol}>
             <label style={labelStyle}>{ui.name}</label>
             <input
               value={nombre}
@@ -269,14 +277,14 @@ function ClientsTab({ pw, lang }: { pw: string; lang: Lang }) {
               style={inputStyle}
             />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={fieldCol}>
             <label style={labelStyle}>{ui.logo}</label>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <button onClick={() => fileRef.current?.click()} style={secondaryBtn}>
                 {uploading ? ui.uploading : pendingPreview ? ui.change : ui.uploadLogo}
               </button>
               {pendingPreview && (
-                <div style={{ width: 48, height: 30, position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid var(--line)" }}>
+                <div style={{ width: 48, height: 30, position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid var(--line)", background: "var(--bg-soft)", flexShrink: 0 }}>
                   <Image src={pendingPreview} alt="" fill style={{ objectFit: "contain" }} />
                 </div>
               )}
@@ -288,34 +296,32 @@ function ClientsTab({ pw, lang }: { pw: string; lang: Lang }) {
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadLogo(f); }}
               />
             </div>
+            <span style={hintStyle}>{ui.logoHint}</span>
           </div>
-          <button onClick={addClient} style={primaryBtn} disabled={!nombre.trim()}>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20, paddingTop: 18, borderTop: "1px solid var(--line)" }}>
+          <button onClick={addClient} style={{ ...primaryBtn, opacity: nombre.trim() ? 1 : 0.5, cursor: nombre.trim() ? "pointer" : "not-allowed" }} disabled={!nombre.trim()}>
             {ui.addClient}
           </button>
         </div>
       </div>
 
       {/* Drag hint pill */}
-      <div style={{
-        display: "inline-flex", alignItems: "center", gap: 8,
-        margin: "20px 0 14px",
-        padding: "7px 14px 7px 10px",
-        borderRadius: 999,
-        background: "color-mix(in oklab, var(--brand-blue-deep) 7%, var(--bg-card))",
-        border: "1px solid color-mix(in oklab, var(--brand-blue-deep) 22%, transparent)",
-        fontSize: 12, fontWeight: 600,
-        color: "var(--brand-blue-deep)",
-        letterSpacing: "0.03em",
-      }}>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          {[0, 4, 8].map((y) => [0, 4, 8].map((x) => (
-            <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.1" fill="currentColor" />
-          )))}
-        </svg>
-        {ui.dragHint}
-      </div>
+      {clients.length > 1 && (
+        <div style={{ margin: "24px 0 14px" }}>
+          <div style={dragPill}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              {[0, 4, 8].map((y) => [0, 4, 8].map((x) => (
+                <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.1" fill="currentColor" />
+              )))}
+            </svg>
+            {ui.dragHint}
+          </div>
+        </div>
+      )}
 
       {/* Grid */}
+      {clients.length === 0 && <div style={emptyState}>{ui.emptyClients}</div>}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
         {clients.map((c, i) => (
           <div
@@ -328,28 +334,29 @@ function ClientsTab({ pw, lang }: { pw: string; lang: Lang }) {
             style={{
               ...cardStyle,
               cursor: "grab",
-              outline: dragOver === i ? "2px solid var(--brand-blue-deep)" : "none",
+              outline: dragOver === i ? "2px solid var(--brand-teal)" : "none",
+              outlineOffset: 2,
               opacity: dragIndex.current === i ? 0.4 : 1,
               transition: "opacity 0.15s, outline 0.15s",
             }}
           >
-            <div style={{ position: "relative", aspectRatio: "16/9", background: "var(--bg-soft)", borderRadius: 8, overflow: "hidden", marginBottom: 10 }}>
+            <div style={{ position: "relative", aspectRatio: "16/9", background: "var(--bg-soft)", borderRadius: 8, overflow: "hidden", marginBottom: 12 }}>
               {c.logoId ? (
-                <Image src={`/api/images/${c.logoId}`} alt={c.nombre} fill style={{ objectFit: "contain", padding: 8 }} />
+                <Image src={`/api/images/${c.logoId}`} alt={c.nombre} fill style={{ objectFit: "contain", padding: 10 }} />
               ) : (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 11, color: "var(--ink-faint)" }}>
                   {ui.noLogo}
                 </div>
               )}
             </div>
-            <p style={{ margin: "0 0 8px", fontWeight: 600, fontSize: 13, color: "var(--brand-blue-deep)" }}>{c.nombre}</p>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: "var(--ink-faint)", flexShrink: 0 }}>
+            <p style={{ margin: "0 0 12px", fontWeight: 600, fontSize: 13.5, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.nombre}</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: "var(--ink-faint)", flexShrink: 0 }} aria-hidden="true">
                 {[0, 5, 10].map((y) => [0, 5, 10].map((x) => (
                   <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.2" fill="currentColor" />
                 )))}
               </svg>
-              <button onClick={() => deleteClient(c._id)} style={{ ...arrowBtn, color: "#c0392b" }}>{ui.delete}</button>
+              <button onClick={() => deleteClient(c._id)} style={smallDangerBtn}>{ui.delete}</button>
             </div>
           </div>
         ))}
@@ -366,12 +373,43 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
   const [form, setForm] = useState<NewsForm | null>(null);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
+  const dragIndex = useRef<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function load() {
     fetch("/api/news").then((r) => r.json()).then(setItems);
   }
   useEffect(load, []);
+
+  async function saveOrder(ordered: NewsItem[]) {
+    await Promise.all(
+      ordered.map((n, i) =>
+        adminFetch(`/api/news/${n._id}`, { method: "PUT", body: JSON.stringify({ order: i }) })
+      )
+    );
+  }
+
+  function onDragStart(i: number) {
+    dragIndex.current = i;
+  }
+
+  function onDragEnter(i: number) {
+    setDragOver(i);
+  }
+
+  function onDragEnd() {
+    const from = dragIndex.current;
+    const to = dragOver;
+    setDragOver(null);
+    dragIndex.current = null;
+    if (from === null || to === null || from === to) return;
+    const reordered = [...items];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+    setItems(reordered);
+    saveOrder(reordered);
+  }
 
   function blankForm(): NewsForm {
     return {
@@ -445,19 +483,25 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
       {form && (
         <div style={{ ...formBox, marginBottom: 24 }}>
           <h3 style={formTitle}>{form._id ? ui.editItem : ui.createItem}</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
             {(["es", "en"] as const).map((l) => (
-              <div key={l} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: 12, letterSpacing: "0.1em", color: "var(--brand-blue-deep)", textTransform: "uppercase" }}>{l.toUpperCase()}</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <div key={l} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <span style={{
+                  alignSelf: "flex-start",
+                  padding: "3px 10px", borderRadius: 999,
+                  fontWeight: 700, fontSize: 11, letterSpacing: "0.1em",
+                  color: "var(--brand-blue-deep)", textTransform: "uppercase",
+                  background: "var(--bg-soft)", border: "1px solid var(--line-strong)",
+                }}>{l.toUpperCase()}</span>
+                <div style={fieldCol}>
                   <label style={labelStyle}>{ui.title}</label>
                   <input value={l === "es" ? form.title_es : form.title_en} onChange={(e) => patch(l === "es" ? "title_es" : "title_en", e.target.value)} style={inputStyle} />
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={fieldCol}>
                   <label style={labelStyle}>{ui.summary}</label>
-                  <textarea value={l === "es" ? form.summary_es : form.summary_en} onChange={(e) => patch(l === "es" ? "summary_es" : "summary_en", e.target.value)} style={{ ...inputStyle, height: 80, resize: "vertical" as const }} />
+                  <textarea value={l === "es" ? form.summary_es : form.summary_en} onChange={(e) => patch(l === "es" ? "summary_es" : "summary_en", e.target.value)} style={{ ...inputStyle, height: 84, resize: "vertical" as const, lineHeight: 1.5 }} />
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={fieldCol}>
                   <label style={labelStyle}>{ui.category}</label>
                   <input value={l === "es" ? form.category_es : form.category_en} onChange={(e) => patch(l === "es" ? "category_es" : "category_en", e.target.value)} style={inputStyle} />
                 </div>
@@ -465,36 +509,37 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
             ))}
           </div>
 
-          <div style={{ display: "flex", gap: 14, marginTop: 14, flexWrap: "wrap", alignItems: "flex-end" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 18, marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--line)", alignItems: "start" }}>
+            <div style={fieldCol}>
               <label style={labelStyle}>{ui.date}</label>
               <input type="date" value={form.date} onChange={(e) => patch("date", e.target.value)} style={inputStyle} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 200 }}>
+            <div style={fieldCol}>
               <label style={labelStyle}>{ui.link}</label>
-              <input value={form.link} onChange={(e) => patch("link", e.target.value)} placeholder="https://..." style={{ ...inputStyle, width: "100%", boxSizing: "border-box" as const }} />
+              <input value={form.link} onChange={(e) => patch("link", e.target.value)} placeholder="https://..." style={inputStyle} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={fieldCol}>
               <label style={labelStyle}>{ui.image}</label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <button onClick={() => fileRef.current?.click()} style={secondaryBtn}>
                   {uploading ? ui.uploading : preview || form.imagenId ? ui.change : ui.uploadImage}
                 </button>
                 {(preview || form.imagenId) && (
-                  <div style={{ width: 60, height: 38, position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid var(--line)" }}>
+                  <div style={{ width: 60, height: 38, position: "relative", borderRadius: 6, overflow: "hidden", border: "1px solid var(--line)", background: "var(--bg-soft)", flexShrink: 0 }}>
                     <Image src={preview || `/api/images/${form.imagenId}`} alt="" fill style={{ objectFit: "cover" }} />
                   </div>
                 )}
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} />
               </div>
+              <span style={hintStyle}>{ui.imageHint}</span>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+          <div style={{ display: "flex", gap: 10, marginTop: 22, paddingTop: 18, borderTop: "1px solid var(--line)" }}>
             <button onClick={save} style={primaryBtn}>{ui.save}</button>
             <button onClick={() => { setForm(null); setPreview(null); }} style={secondaryBtn}>{ui.cancel}</button>
             {form._id && (
-              <button onClick={async () => { await del(form._id!); setForm(null); setPreview(null); }} style={{ ...secondaryBtn, color: "#c0392b", marginLeft: "auto" }}>
+              <button onClick={async () => { await del(form._id!); setForm(null); setPreview(null); }} style={{ ...dangerBtn, marginLeft: "auto" }}>
                 {ui.delete}
               </button>
             )}
@@ -502,30 +547,72 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
         </div>
       )}
 
-      {/* List */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {items.filter((n) => n._id !== form?._id).map((n) => (
-          <div key={n._id} style={{ ...cardStyle, display: "flex", gap: 14, alignItems: "center" }}>
-            <div style={{ width: 80, height: 50, position: "relative", borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "var(--bg-soft)" }}>
-              {n.imagenId
-                ? <Image src={`/api/images/${n.imagenId}`} alt="" fill style={{ objectFit: "cover" }} />
-                : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 10, color: "var(--ink-faint)" }}>{ui.noImg}</div>
-              }
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "var(--brand-blue-deep)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {n.titulo[lang]}
-              </p>
-              <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--ink-faint)" }}>
-                {n.categoria[lang]} · {n.fecha ? new Date(n.fecha).toLocaleDateString(lang === "es" ? "es-AR" : "en-US") : "—"}
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <button onClick={() => openEdit(n)} style={secondaryBtn}>{ui.edit}</button>
-              <button onClick={() => del(n._id)} style={{ ...secondaryBtn, color: "#c0392b" }}>{ui.delete}</button>
-            </div>
+      {/* Drag hint pill — only when not editing and there's something to sort */}
+      {!form && items.length > 1 && (
+        <div style={{ margin: "0 0 14px" }}>
+          <div style={dragPill}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              {[0, 4, 8].map((y) => [0, 4, 8].map((x) => (
+                <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.1" fill="currentColor" />
+              )))}
+            </svg>
+            {ui.dragHint}
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* List */}
+      {!form && items.length === 0 && <div style={emptyState}>{ui.emptyNews}</div>}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {items.map((n, i) => {
+          if (n._id === form?._id) return null;
+          const draggable = !form;
+          return (
+            <div
+              key={n._id}
+              draggable={draggable}
+              onDragStart={draggable ? () => onDragStart(i) : undefined}
+              onDragEnter={draggable ? () => onDragEnter(i) : undefined}
+              onDragOver={draggable ? (e) => e.preventDefault() : undefined}
+              onDragEnd={draggable ? onDragEnd : undefined}
+              style={{
+                ...cardStyle,
+                display: "flex", gap: 14, alignItems: "center",
+                cursor: draggable ? "grab" : "default",
+                outline: dragOver === i ? "2px solid var(--brand-teal)" : "none",
+                outlineOffset: 2,
+                opacity: dragIndex.current === i ? 0.4 : 1,
+                transition: "opacity 0.15s, outline 0.15s",
+              }}
+            >
+              {draggable && (
+                <svg width="14" height="20" viewBox="0 0 14 20" fill="none" style={{ color: "var(--ink-faint)", flexShrink: 0 }} aria-hidden="true">
+                  {[0, 5, 10, 15].map((y) => [0, 6].map((x) => (
+                    <circle key={`${x}-${y}`} cx={3 + x} cy={3 + y} r="1.3" fill="currentColor" />
+                  )))}
+                </svg>
+              )}
+              <div style={{ width: 80, height: 50, position: "relative", borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "var(--bg-soft)" }}>
+                {n.imagenId
+                  ? <Image src={`/api/images/${n.imagenId}`} alt="" fill style={{ objectFit: "cover" }} />
+                  : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 10, color: "var(--ink-faint)" }}>{ui.noImg}</div>
+                }
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {n.titulo[lang]}
+                </p>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: "var(--ink-faint)" }}>
+                  {n.categoria[lang]} · {n.fecha ? new Date(n.fecha).toLocaleDateString(lang === "es" ? "es-AR" : "en-US") : "—"}
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <button onClick={() => openEdit(n)} style={smallBtn}>{ui.edit}</button>
+                <button onClick={() => del(n._id)} style={smallDangerBtn}>{ui.delete}</button>
+              </div>
+            </div>
+          );
+        })}
       </div>
       {confirmModal}
     </div>
@@ -533,6 +620,8 @@ function NewsTab({ pw, lang }: { pw: string; lang: Lang }) {
 }
 
 /* ─── shared styles ──────────────────────────────────────── */
+const DANGER = "#c0392b";
+
 const formBox: React.CSSProperties = {
   background: "var(--bg-card)",
   border: "1px solid var(--line)",
@@ -540,63 +629,109 @@ const formBox: React.CSSProperties = {
   padding: "24px 28px",
 };
 const formTitle: React.CSSProperties = {
-  margin: "0 0 18px",
-  fontSize: 15,
+  margin: "0 0 20px",
+  fontSize: 16,
   fontWeight: 700,
-  color: "var(--brand-blue-deep)",
+  letterSpacing: "-0.01em",
+  color: "var(--ink)",
+};
+const fieldCol: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+  minWidth: 0,
 };
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
-  letterSpacing: "0.08em",
+  letterSpacing: "0.07em",
   textTransform: "uppercase",
   color: "var(--ink-faint)",
 };
+const hintStyle: React.CSSProperties = {
+  fontSize: 11.5,
+  color: "var(--ink-faint)",
+  marginTop: 2,
+  lineHeight: 1.4,
+};
 const inputStyle: React.CSSProperties = {
-  padding: "8px 12px",
+  padding: "9px 12px",
   borderRadius: 8,
   border: "1px solid var(--line-strong)",
   background: "var(--bg-soft)",
   fontSize: 14,
-  color: "var(--brand-blue-deep)",
+  color: "var(--ink)",
   outline: "none",
-  minWidth: 180,
+  width: "100%",
+  boxSizing: "border-box",
 };
 const primaryBtn: React.CSSProperties = {
-  padding: "9px 20px",
+  padding: "10px 20px",
   borderRadius: 8,
   background: "var(--brand-blue-deep)",
-  color: "white",
+  color: "#fff",
   fontWeight: 700,
   fontSize: 13,
-  border: "none",
+  lineHeight: 1.2,
+  border: "1px solid var(--brand-blue-deep)",
   cursor: "pointer",
+  transition: "opacity 0.15s var(--ease-smooth)",
 };
 const secondaryBtn: React.CSSProperties = {
-  padding: "9px 16px",
+  padding: "10px 16px",
   borderRadius: 8,
-  background: "var(--bg-soft)",
-  color: "var(--brand-blue-deep)",
+  background: "var(--bg-card)",
+  color: "var(--ink)",
   fontWeight: 600,
   fontSize: 13,
+  lineHeight: 1.2,
   border: "1px solid var(--line-strong)",
   cursor: "pointer",
+  transition: "background 0.15s var(--ease-smooth), border-color 0.15s var(--ease-smooth)",
 };
-const arrowBtn: React.CSSProperties = {
-  padding: "4px 8px",
-  borderRadius: 6,
-  background: "var(--bg-soft)",
-  color: "var(--brand-blue-deep)",
-  fontWeight: 600,
+const dangerBtn: React.CSSProperties = {
+  ...secondaryBtn,
+  color: DANGER,
+  borderColor: "color-mix(in oklab, #c0392b 30%, var(--line-strong))",
+};
+const smallBtn: React.CSSProperties = {
+  ...secondaryBtn,
+  padding: "7px 12px",
   fontSize: 12,
-  border: "1px solid var(--line)",
-  cursor: "pointer",
+};
+const smallDangerBtn: React.CSSProperties = {
+  ...smallBtn,
+  color: DANGER,
+  borderColor: "color-mix(in oklab, #c0392b 30%, var(--line-strong))",
 };
 const cardStyle: React.CSSProperties = {
   background: "var(--bg-card)",
   border: "1px solid var(--line)",
+  borderRadius: 12,
+  padding: 14,
+};
+const emptyState: React.CSSProperties = {
+  padding: "40px 24px",
+  textAlign: "center",
   borderRadius: 14,
-  padding: "14px",
+  border: "1px dashed var(--line-strong)",
+  background: "var(--bg-card)",
+  fontSize: 13.5,
+  color: "var(--ink-faint)",
+  lineHeight: 1.5,
+};
+const dragPill: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "6px 13px 6px 10px",
+  borderRadius: 999,
+  background: "var(--bg-card)",
+  border: "1px solid var(--line-strong)",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "var(--ink-soft)",
+  letterSpacing: "0.02em",
 };
 
 /* ─── main page ──────────────────────────────────────────── */
@@ -636,23 +771,30 @@ export default function AdminPage() {
       }}>
         <div style={{
           background: "var(--bg-card)", border: "1px solid var(--line)",
-          borderRadius: 20, padding: "40px 48px", width: 360,
-          display: "flex", flexDirection: "column", gap: 16,
+          borderRadius: 20, padding: "40px 40px 36px", width: 380, maxWidth: "100%",
+          display: "flex", flexDirection: "column", gap: 8,
+          boxShadow: "0 24px 50px -30px color-mix(in oklab, var(--brand-blue-deep) 35%, transparent)",
         }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "var(--brand-blue-deep)" }}>
+          <span style={{
+            fontSize: 11, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase",
+            color: "var(--brand-orange)",
+          }}>IOT in Motion</span>
+          <h1 style={{ margin: "6px 0 0", fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--ink)" }}>
             Admin Panel
           </h1>
-          <p style={{ margin: 0, fontSize: 14, color: "var(--ink-soft)" }}>IOT in Motion</p>
+          <p style={{ margin: "6px 0 20px", fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.5 }}>
+            Sign in to manage clients and news.
+          </p>
           <input
             type="password"
             placeholder="Password"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && login()}
-            style={{ ...inputStyle, width: "100%", boxSizing: "border-box" }}
+            style={{ ...inputStyle, padding: "11px 14px" }}
           />
-          {error && <p style={{ margin: 0, fontSize: 13, color: "#c0392b" }}>Incorrect password</p>}
-          <button onClick={login} style={{ ...primaryBtn, width: "100%" }}>Sign in</button>
+          {error && <p style={{ margin: "8px 0 0", fontSize: 13, color: DANGER }}>Incorrect password</p>}
+          <button onClick={login} style={{ ...primaryBtn, width: "100%", padding: "12px 20px", marginTop: 8 }}>Sign in</button>
         </div>
       </div>
     );
@@ -662,12 +804,18 @@ export default function AdminPage() {
     <div style={{ minHeight: "100vh", background: "var(--bg-soft)", padding: "40px 24px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
+        <div style={{
+          display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+          flexWrap: "wrap", gap: 16, marginBottom: 28,
+        }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: "var(--brand-blue-deep)" }}>Admin Panel</h1>
-            <p style={{ margin: "4px 0 0", fontSize: 14, color: "var(--ink-faint)" }}>IOT in Motion</p>
+            <span style={{
+              fontSize: 11, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase",
+              color: "var(--brand-orange)",
+            }}>IOT in Motion</span>
+            <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--ink)" }}>Admin Panel</h1>
           </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             {/* Language toggle */}
             <div style={{
               display: "flex", borderRadius: 8, overflow: "hidden",
@@ -678,9 +826,9 @@ export default function AdminPage() {
                   key={l}
                   onClick={() => setLang(l)}
                   style={{
-                    padding: "8px 14px", border: "none", cursor: "pointer",
+                    padding: "9px 14px", border: "none", cursor: "pointer",
                     background: lang === l ? "var(--brand-blue-deep)" : "var(--bg-card)",
-                    color: lang === l ? "white" : "var(--brand-blue-deep)",
+                    color: lang === l ? "#fff" : "var(--ink-soft)",
                     fontWeight: 700, fontSize: 12,
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
@@ -689,6 +837,7 @@ export default function AdminPage() {
                 >{l}</button>
               ))}
             </div>
+            <span style={{ width: 1, alignSelf: "stretch", background: "var(--line)", margin: "2px 2px" }} aria-hidden="true" />
             <a href="/" style={{ ...secondaryBtn, textDecoration: "none" }}>{ui.backToSite}</a>
             <button onClick={() => { sessionStorage.removeItem("admin_pw"); setPw(""); }} style={secondaryBtn}>
               {ui.signOut}
@@ -697,17 +846,19 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
+        <div style={{ display: "flex", gap: 28, marginBottom: 28, borderBottom: "1px solid var(--line)" }}>
           {(["clients", "news"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               style={{
-                padding: "10px 22px", borderRadius: 10,
-                background: tab === t ? "var(--brand-blue-deep)" : "var(--bg-card)",
-                color: tab === t ? "white" : "var(--brand-blue-deep)",
-                fontWeight: 700, fontSize: 14, border: "1px solid var(--line-strong)",
+                padding: "0 2px 12px", background: "none", border: "none",
+                borderBottom: tab === t ? "2px solid var(--brand-teal)" : "2px solid transparent",
+                marginBottom: -1,
+                color: tab === t ? "var(--ink)" : "var(--ink-faint)",
+                fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em",
                 cursor: "pointer",
+                transition: "color 0.15s, border-color 0.15s",
               }}
             >{t === "clients" ? ui.clients : ui.news}</button>
           ))}
