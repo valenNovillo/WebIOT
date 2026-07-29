@@ -1,48 +1,9 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 import { useLang } from "./LangContext";
 import { useReveal } from "./useReveal";
 import PdfModal from "./PdfModal";
-
-const SOL_IMAGES: Record<string, string> = {
-  lorawan:    "/images/soluciones/redes/redes.png",
-  traffic:    "/images/soluciones/smart-city/contador-transito.png",
-  levels:     "/images/soluciones/smart-city/sensor-nivel.png",
-  parking:    "/images/soluciones/smart-city/sensor-estacionamiento.png",
-  climate:    "/images/soluciones/smart-city/estacion-meteorologica.png",
-  gas:        "/images/soluciones/smart-city/estacion-monoxido-metano.png",
-  cardiac:    "/images/soluciones/salud/button.png",
-  optimize:   "/images/soluciones/industria/monitoreo-energia.png",
-  "gas-sec":  "/images/soluciones/seguridad/camaras1.png",
-};
-
-function SolIcon({ id }: { id: string }) {
-  const paths: Record<string, React.ReactNode> = {
-    lorawan: <path d="M12 8a8 8 0 018 8M12 4a12 12 0 0112 12M12 12a4 4 0 014 4M12 16h.01" />,
-    macro: <path d="M3 12h4l3-7 4 14 3-7h4" />,
-    traffic: <><rect x="6" y="4" width="12" height="16" rx="2" /><circle cx="12" cy="8" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="16" r="1" /></>,
-    levels: <><rect x="4" y="3" width="6" height="18" rx="1" /><rect x="14" y="3" width="6" height="18" rx="1" /><path d="M4 14h6M14 9h6" /></>,
-    parking: <><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 17V7h4a3 3 0 010 6H9" /></>,
-    climate: <><circle cx="12" cy="10" r="3" /><path d="M12 3v2M12 15v2M3 10h2M19 10h2M5.6 4.6l1.4 1.4M17 16l1.4 1.4M5.6 16l1.4-1.4M17 4.6l1.4-1.4" /><path d="M4 20h16" /></>,
-    gas: <><path d="M9 4h6l1 3-1 13H8L7 7z" /><circle cx="12" cy="14" r="2" /></>,
-    "gas-sec": <><path d="M9 4h6l1 3-1 13H8L7 7z" /><circle cx="12" cy="14" r="2" /></>,
-    cardiac: <path d="M3 12h4l2-5 4 10 2-5h6" />,
-    assets: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
-    env: <><path d="M12 3a4 4 0 014 4c0 3-4 5-4 8M8 19h8" /></>,
-    continuity: <><path d="M4 12a8 8 0 1116 0 8 8 0 01-16 0z" /><path d="M12 8v5l3 2" /></>,
-    risk: <><path d="M12 3l10 18H2L12 3z" /><path d="M12 10v5M12 18h.01" /></>,
-    optimize: <path d="M3 18l5-9 4 5 4-9 5 13" />,
-    flood: <><path d="M3 14a3 3 0 016 0 3 3 0 016 0 3 3 0 016 0M3 19a3 3 0 016 0 3 3 0 016 0 3 3 0 016 0M12 5v5" /></>,
-    people: <><circle cx="9" cy="7" r="3" /><circle cx="16" cy="9" r="2" /><path d="M3 19c0-3 3-5 6-5s6 2 6 5M14 19c0-2 2-3 4-3s3 1 3 3" /></>,
-  };
-  return (
-    <svg style={{ position: "absolute", inset: 0, width: "56%", height: "56%", margin: "auto", color: "rgba(255,255,255,0.95)" }}
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-      {paths[id] || <><circle cx="12" cy="12" r="6" /><path d="M12 6v6l4 2" /></>}
-    </svg>
-  );
-}
+import IotScene from "./IotScene";
 
 interface PdfTarget { pdf: string; solucion: string; categoria: string; }
 
@@ -196,22 +157,8 @@ export default function Solutions() {
                     )}
                   </div>
                 </div>
-                <div style={{
-                  order: i % 2 === 0 ? 2 : 1,
-                  position: "relative", aspectRatio: "4 / 3", borderRadius: 14, overflow: "hidden",
-                  background: "var(--bg-soft)",
-                }}>
-                  {SOL_IMAGES[item.id] ? (
-                    <Image
-                      src={SOL_IMAGES[item.id]}
-                      alt={item.t}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      sizes="240px"
-                    />
-                  ) : (
-                    <SolIcon id={item.id} />
-                  )}
+                <div style={{ order: i % 2 === 0 ? 2 : 1 }}>
+                  <IotScene code={item.id} ratio="4 / 3" radius={14} />
                 </div>
               </article>
             ))}
