@@ -57,8 +57,9 @@ function water(code: string) {
       </g>
       <ellipse cx={130} cy={80} rx={52} ry={14} />
       <path d="M78 80 V210 a52 14 0 00104 0 V80" />
-      <rect x={116} y={52} width={28} height={16} rx={3} fill={TEAL_FILL} />
-      <path d="M130 68 L130 146" strokeDasharray="4 5" opacity={0.5} />
+      <rect x={115} y={50} width={30} height={16} rx={3} fill={TEAL_FILL} />
+      <path d="M120 66 h20" strokeWidth={2.2} />
+      <path d="M130 66 L130 146" strokeDasharray="4 5" opacity={0.5} />
       <path d="M206 96 L206 202" />
       <path d="M206 108 h7 M206 132 h5 M206 150 h7 M206 174 h5 M206 194 h7" />
       <circle cx={206} cy={150} r={4.5} fill="var(--brand-orange)" stroke="none" />
