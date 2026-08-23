@@ -11,6 +11,7 @@ import Clients from "./_components/Clients";
 import Contact from "./_components/Contact";
 import Footer from "./_components/Footer";
 import ScrollTop from "./_components/ScrollTop";
+import BannerPopup from "./_components/BannerPopup";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
       </main>
       <Footer />
       <ScrollTop />
+      <BannerPopup />
     </>
   );
 }
